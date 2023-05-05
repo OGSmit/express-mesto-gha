@@ -100,7 +100,10 @@ console.log(req.body)
     .findByIdAndUpdate(req.user._id,
       {
         avatar
-      }
+      },{
+        new: true,
+        runValidators: true,
+      },
     )
     .then((user) => res.status(200)
       .send(user))
