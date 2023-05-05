@@ -22,12 +22,16 @@ app.use((req, res, next) => {
   req.user = {
     _id: '6454c9f8093db9a4f3ef080a'
   };
-
   next();
 });
 
-app.use('/', routesUser);
-app.use('/', routesCard);
+app.use('/users', routesUser);
+app.use('/cards', routesCard);
+app.use('/*', (req, res) => {
+  res.status(404)
+    .send({ message: '404: Not Found' });
+});
+
 
 app.listen(PORT, () => {
     console.log(`App listening on port ${PORT}`)
