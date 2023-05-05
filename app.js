@@ -20,7 +20,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use((req, res, next) => {
   req.user = {
-    _id: '6453d79960195bdeb03badd2'
+    _id: '6454c9f8093db9a4f3ef080a'
   };
 
   next();

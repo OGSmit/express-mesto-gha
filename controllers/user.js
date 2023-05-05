@@ -8,6 +8,9 @@ module.exports.getUsers = (req, res) => {
  };
 
  module.exports.createUser = (req, res) => {
+
+console.log(req.body)
+
    const {
      name,
      about,
@@ -55,17 +58,25 @@ module.exports.getUsers = (req, res) => {
  };
 
  module.exports.updateUser = (req, res) => {
+
+  console.log(req.body)
+
   const {
     name,
     about,
   } = req.body;
+
+  console.log(name,about)
 
   User
     .findByIdAndUpdate(req.user._id,
       {
         name,
         about,
-      }
+      }, {
+        new: true,
+        runValidators: true,
+      },
     )
     .then((user) => res.status(200)
       .send({ data: user}))
