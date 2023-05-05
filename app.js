@@ -1,14 +1,15 @@
-
 const express = require('express');
 const path = require('path');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
+const helmet = require('helmet');
 const routesUser = require('./routes/user');
 const routesCard = require('./routes/card');
 
 const { PORT = 3000 } = process.env;
 
 const app = express();
+app.use(helmet());
 
 app.use(bodyParser.json());
 
@@ -20,7 +21,7 @@ app.use(express.static(path.join(__dirname, 'public')));
 
 app.use((req, res, next) => {
   req.user = {
-    _id: '6454c9f8093db9a4f3ef080a'
+    _id: '6454c9f8093db9a4f3ef080a',
   };
   next();
 });
@@ -32,7 +33,6 @@ app.use('/*', (req, res) => {
     .send({ message: '404: Not Found' });
 });
 
-
 app.listen(PORT, () => {
-    console.log(`App listening on port ${PORT}`)
-})
+  console.log(`App listening on port ${PORT}`);
+});

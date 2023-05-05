@@ -10,7 +10,7 @@ module.exports.getCards = (req, res) => {
 module.exports.createCard = (req, res) => {
   const {
     name,
-    link
+    link,
   } = req.body;
   Card
     .create({
@@ -34,6 +34,7 @@ module.exports.deleteCardById = (req, res) => {
   const { cardId } = req.params;
   Card
     .findByIdAndRemove(cardId)
+    .orFail()
     .then((card) => {
       if (!card) {
         return res.status(404)
@@ -54,7 +55,8 @@ module.exports.deleteCardById = (req, res) => {
 };
 
 module.exports.likeCard = (req, res) => {
-  Card.findByIdAndUpdate(req.params.cardId,
+  Card.findByIdAndUpdate(
+    req.params.cardId,
     { $addToSet: { likes: req.user._id } },
     { new: true },
   ).then((card) => {
@@ -73,29 +75,29 @@ module.exports.likeCard = (req, res) => {
         res.status(500)
           .send({ message: err.message });
       }
-    })
-}
+    });
+};
 
-module.exports.dislikeCard = (req, res) =>{
- Card.findByIdAndUpdate(
-  req.params.cardId,
-  { $pull: { likes: req.user._id } },
-  { new: true },
-).then((card) => {
-  if (!card) {
-    return res.status(404)
-      .send({ message: 'Not found: Invalid _id' });
-  }
-  return res.status(200)
-    .send(card);
-})
-.catch((err) => {
-  if (err.name === 'CastError') {
-    res.status(400)
-      .send({ message: 'Card with _id cannot be found' });
-  } else {
-    res.status(500)
-      .send({ message: err.message });
-  }
-});
-}
+module.exports.dislikeCard = (req, res) => {
+  Card.findByIdAndUpdate(
+    req.params.cardId,
+    { $pull: { likes: req.user._id } },
+    { new: true },
+  ).then((card) => {
+    if (!card) {
+      return res.status(404)
+        .send({ message: 'Not found: Invalid _id' });
+    }
+    return res.status(200)
+      .send(card);
+  })
+    .catch((err) => {
+      if (err.name === 'CastError') {
+        res.status(400)
+          .send({ message: 'Card with _id cannot be found' });
+      } else {
+        res.status(500)
+          .send({ message: err.message });
+      }
+    });
+};
