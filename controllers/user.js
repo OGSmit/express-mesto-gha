@@ -68,7 +68,7 @@ module.exports.getUsers = (req, res) => {
       }
     )
     .then((user) => res.status(200)
-      .send(user))
+      .send({ data: user}))
     .catch((err) => {
       if (err.name === 'CastError' || err.name === 'ValidationError') {
         return res.status(400)
