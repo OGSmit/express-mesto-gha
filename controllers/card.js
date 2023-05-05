@@ -34,7 +34,7 @@ module.exports.deleteCardById = (req, res) => {
   const { cardId } = req.params;
   Card
     .findByIdAndRemove(cardId)
-    // .orFail()
+    // .orFail() если включить Автотест выкидывает ошибку
     .then((card) => {
       if (!card) {
         return res.status(404)
