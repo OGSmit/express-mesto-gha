@@ -34,7 +34,7 @@ module.exports.deleteCardById = (req, res) => {
   const { cardId } = req.params;
   Card
     .findByIdAndRemove(cardId)
-    .orFail()
+    // .orFail()
     .then((card) => {
       if (!card) {
         return res.status(404)
