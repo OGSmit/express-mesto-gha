@@ -116,6 +116,11 @@ module.exports.updateUserAvatar = (req, res) => {
           .send({ message: 'Invalid data to update user' });
       }
 
+      if (err.name === 'DocumentNotFoundError') {
+        return res.status(404)
+          .send({ message: 'User with _id cannot be found' });
+      }
+
       return res.status(500)
         .send({ message: err.message });
     });
