@@ -36,14 +36,17 @@ module.exports.deleteCardById = (req, res, next) => {
   const { cardId } = req.params;
   Card
     .findByIdAndRemove(cardId)
-    // .orFail() если включить Автотест выкидывает ошибку
-    .then((card) => {
-      if (!card) {
-        throw new NotFoundError({ message: 'карточка с таким id - отсутствует' });
-      }
-      return res.status(200)
-        .send(card);
+    .orFail()
+    .catch(() => {
+      throw new NotFoundError({ message: 'карточка с таким id - отсутствует' });
     })
+    // .then((card) => {
+    //   if (!card) {
+    //     throw new NotFoundError('карточка с таким id - отсутствует');
+    //   }
+    //   return res.status(200)
+    //     .send(card);
+    // })
     .catch((err) => {
       if (err.name === 'CastError') {
         throw new NotFoundError({ message: 'карточка с таким id - отсутствует' });
