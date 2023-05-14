@@ -1,4 +1,6 @@
 const Card = require('../models/card');
+const NotFoundError = require('../error/not-found-error');
+const BadRequestError = require('../error/bad-request');
 
 module.exports.getCards = (req, res) => {
   Card.find({})
@@ -7,7 +9,7 @@ module.exports.getCards = (req, res) => {
       .send({ message: err.message }));
 };
 
-module.exports.createCard = (req, res) => {
+module.exports.createCard = (req, res, next) => {
   const {
     name,
     link,
@@ -21,72 +23,69 @@ module.exports.createCard = (req, res) => {
       .send(card))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(400)
-          .send({ message: 'Invalid data to create card' });
-      } else {
-        res.status(500)
-          .send({ message: err.message });
-      }
-    });
+        throw new BadRequestError({ message: 'некорректный запрос на сервер' });
+      } // else {
+      // res.status(500)
+      // .send({ message: err.message });
+      // }
+    })
+    .catch(next);
 };
 
-module.exports.deleteCardById = (req, res) => {
+module.exports.deleteCardById = (req, res, next) => {
   const { cardId } = req.params;
   Card
     .findByIdAndRemove(cardId)
     // .orFail() если включить Автотест выкидывает ошибку
     .then((card) => {
       if (!card) {
-        return res.status(404)
-          .send({ message: 'Not found: Invalid _id' });
+        throw new NotFoundError({ message: 'карточка с таким id - отсутствует' });
       }
       return res.status(200)
         .send(card);
     })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(400)
-          .send({ message: 'Card with _id cannot be found' });
+        throw new NotFoundError({ message: 'карточка с таким id - отсутствует' });
       } else {
         res.status(500)
           .send({ message: err.message });
       }
-    });
+    })
+    .catch(next);
 };
 
-module.exports.likeCard = (req, res) => {
+module.exports.likeCard = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $addToSet: { likes: req.user._id } },
     { new: true },
   ).then((card) => {
     if (!card) {
-      return res.status(404)
-        .send({ message: 'Not found: Invalid _id' });
+      throw new NotFoundError({ message: 'карточка с таким id - отсутствует' });
     }
     return res.status(200)
       .send(card);
   })
     .catch((err) => {
       if (err.name === 'CastError') {
-        res.status(400)
-          .send({ message: 'Card with _id cannot be found' });
+        throw new NotFoundError({ message: 'карточка с таким id - отсутствует' });
       } else {
         res.status(500)
           .send({ message: err.message });
       }
-    });
+    })
+    .catch(next);
 };
 
-module.exports.dislikeCard = (req, res) => {
+module.exports.dislikeCard = (req, res, next) => {
   Card.findByIdAndUpdate(
     req.params.cardId,
     { $pull: { likes: req.user._id } },
     { new: true },
   ).then((card) => {
     if (!card) {
-      return res.status(404)
-        .send({ message: 'Not found: Invalid _id' });
+      throw new NotFoundError({ message: 'карточка с таким id - отсутствует' });
     }
     return res.status(200)
       .send(card);
@@ -99,5 +98,6 @@ module.exports.dislikeCard = (req, res) => {
         res.status(500)
           .send({ message: err.message });
       }
-    });
+    })
+    .catch(next);
 };

@@ -33,6 +33,14 @@ app.use('/*', (req, res) => {
     .send({ message: '404: Not Found' });
 });
 
+app.use((err, req, res, next) => {
+  if (err.status) {
+    return res.status(err.status).send(err.message);
+  }
+  res.status(500).send({ message: `На сервере произошла ошибка: ${err.message}` });
+  return next();
+});
+
 app.listen(PORT, () => {
   console.log(`App listening on port ${PORT}`);
 });

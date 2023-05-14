@@ -1,6 +1,9 @@
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
+const NotFoundError = require('../error/not-found-error');
+const AuthorisationError = require('../error/authorisation-error');
+const NoStatusError = require('../error/no-status-error');
 
 module.exports.getUsers = (req, res) => {
   User.find({})
@@ -9,7 +12,7 @@ module.exports.getUsers = (req, res) => {
       .send({ message: err.message }));
 };
 
-module.exports.createUser = (req, res) => {
+module.exports.createUser = (req, res, next) => {
   const {
     name,
     about,
@@ -30,16 +33,15 @@ module.exports.createUser = (req, res) => {
       .send(user))
     .catch((err) => {
       if (err.name === 'ValidationError') {
-        res.status(400)
-          .send({ message: 'Invalid data to create user' });
+        throw new AuthorisationError({ message: err.message });
       } else {
-        res.status(500)
-          .send({ message: err.message });
+        throw new NoStatusError({ message: err.message });
       }
-    });
+    })
+    .catch(next);
 };
 
-module.exports.getUserById = (req, res) => {
+module.exports.getUserById = (req, res, next) => {
   const { userId } = req.params;
   User
     .findById(userId).select('+password')
@@ -52,16 +54,16 @@ module.exports.getUserById = (req, res) => {
       }
 
       if (err.name === 'DocumentNotFoundError') {
-        return res.status(404)
-          .send({ message: 'User with _id cannot be found' });
+        throw new NotFoundError({ message: 'пользователь с таким id - отсутствует' });
       }
 
       return res.status(500)
         .send({ message: err.message });
-    });
+    })
+    .catch(next);
 };
 
-module.exports.updateUser = (req, res) => {
+module.exports.updateUser = (req, res, next) => {
   const {
     name,
     about,
@@ -89,16 +91,16 @@ module.exports.updateUser = (req, res) => {
       }
 
       if (err.name === 'DocumentNotFoundError') {
-        return res.status(404)
-          .send({ message: 'User with _id cannot be found' });
+        throw new NotFoundError({ message: 'пользователь с таким id - отсутствует' });
       }
 
       return res.status(500)
         .send({ message: err.message });
-    });
+    })
+    .catch(next);
 };
 
-module.exports.updateUserAvatar = (req, res) => {
+module.exports.updateUserAvatar = (req, res, next) => {
   const {
     avatar,
   } = req.body;
@@ -123,13 +125,13 @@ module.exports.updateUserAvatar = (req, res) => {
       }
 
       if (err.name === 'DocumentNotFoundError') {
-        return res.status(404)
-          .send({ message: 'User with _id cannot be found' });
+        throw new NotFoundError({ message: 'пользователь с таким id - отсутствует' });
       }
 
       return res.status(500)
         .send({ message: err.message });
-    });
+    })
+    .catch(next);
 };
 
 module.exports.login = (req, res) => {
@@ -137,10 +139,8 @@ module.exports.login = (req, res) => {
 
   return User.findUserByCredentials(email, password)
     .then((user) => {
-      // создадим токен
       const token = jwt.sign({ _id: user._id }, 'super-puper-secret-key', { expiresIn: '7d' });
 
-      // вернём токен
       res.send({ token });
     })
     .catch((err) => {
@@ -150,6 +150,12 @@ module.exports.login = (req, res) => {
     });
 };
 
-// module.exports.getCurrentUser = (req, res) => {
-
-// };
+module.exports.getCurrentUser = (req, res, next) => {
+  User.findById(req.params._id)
+    .orFail()
+    .catch(() => {
+      throw new NotFoundError({ message: 'пользователь с таким id - отсутствует' });
+    })
+    .then((user) => res.send({ data: user }))
+    .catch(next);
+};
