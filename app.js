@@ -3,7 +3,7 @@ const path = require('path');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const helmet = require('helmet');
-const { errors } = require('celebrate');
+const { celebrate, Joi, errors } = require('celebrate');
 const routesUser = require('./routes/user');
 const routesCard = require('./routes/card');
 const auth = require('./middlewares/auth');
@@ -20,10 +20,26 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 mongoose.connect('mongodb://127.0.0.1:27017/mestodb');
 
+app.use((req, res, next) => {
+  req.user = {
+    _id: '64621b3afde5f2a29f86b8e7',
+  };
+
+  next();
+});
+
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(errors());
 
-app.post('/signup', createUser);
+app.post('/signup', celebrate({
+  body: Joi.object().keys({
+    name: Joi.string().min(2).max(30),
+    about: Joi.string().min(2).max(30),
+    avatar: Joi.string(),
+    email: Joi.string().required().email(),
+    password: Joi.string().required().min(8),
+  }),
+}), createUser);
 app.post('/signin', login);
 
 app.use(auth);
