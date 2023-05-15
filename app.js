@@ -42,10 +42,8 @@ app.post('/signup', celebrate({
 }), createUser);
 app.post('/signin', login);
 
-app.use(auth);
-
-app.use('/users', routesUser);
-app.use('/cards', routesCard);
+app.use('/users', auth, routesUser);
+app.use('/cards', auth, routesCard);
 app.use('/*', (req, res) => {
   res.status(404)
     .send({ message: '404: страница не найдена' });
