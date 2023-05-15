@@ -1,12 +1,11 @@
 const Card = require('../models/card');
 const NotFoundError = require('../error/not-found-error');
-const BadRequestError = require('../error/bad-request');
+const NoStatusError = require('../error/no-status-error');
 
-module.exports.getCards = (req, res) => {
+module.exports.getCards = (req, res, next) => {
   Card.find({})
     .then((cards) => res.send(cards))
-    .catch((err) => res.status(500)
-      .send({ message: err.message }));
+    .catch(next);
 };
 
 module.exports.createCard = (req, res, next) => {
@@ -14,6 +13,7 @@ module.exports.createCard = (req, res, next) => {
     name,
     link,
   } = req.body;
+
   Card
     .create({
       name,
@@ -21,14 +21,6 @@ module.exports.createCard = (req, res, next) => {
     })
     .then((card) => res.status(201)
       .send(card))
-    .catch((err) => {
-      if (err.name === 'ValidationError') {
-        throw new BadRequestError({ message: 'некорректный запрос на сервер' });
-      } // else {
-      // res.status(500)
-      // .send({ message: err.message });
-      // }
-    })
     .catch(next);
 };
 
@@ -37,22 +29,15 @@ module.exports.deleteCardById = (req, res, next) => {
   Card
     .findByIdAndRemove(cardId)
     .orFail()
-    .catch(() => {
-      throw new NotFoundError({ message: 'карточка с таким id - отсутствует' });
+    .then((card) => {
+      res.status(200)
+        .send(card);
     })
-    // .then((card) => {
-    //   if (!card) {
-    //     throw new NotFoundError('карточка с таким id - отсутствует');
-    //   }
-    //   return res.status(200)
-    //     .send(card);
-    // })
     .catch((err) => {
       if (err.name === 'CastError') {
-        throw new NotFoundError({ message: 'карточка с таким id - отсутствует' });
+        throw new NotFoundError('карточка с таким id - отсутствует');
       } else {
-        res.status(500)
-          .send({ message: err.message });
+        throw new NoStatusError('Что-то пошло не так');
       }
     })
     .catch(next);
@@ -74,8 +59,7 @@ module.exports.likeCard = (req, res, next) => {
       if (err.name === 'CastError') {
         throw new NotFoundError({ message: 'карточка с таким id - отсутствует' });
       } else {
-        res.status(500)
-          .send({ message: err.message });
+        throw new NoStatusError('Что-то пошло не так');
       }
     })
     .catch(next);
@@ -96,10 +80,9 @@ module.exports.dislikeCard = (req, res, next) => {
     .catch((err) => {
       if (err.name === 'CastError') {
         res.status(400)
-          .send({ message: 'Card with _id cannot be found' });
+          .send({ message: 'карточка с таким id - отсутствует' });
       } else {
-        res.status(500)
-          .send({ message: err.message });
+        throw new NoStatusError('Что-то пошло не так');
       }
     })
     .catch(next);

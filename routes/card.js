@@ -4,11 +4,11 @@ const {
   getCards, createCard, deleteCardById, likeCard, dislikeCard,
 } = require('../controllers/card');
 
-router.get('/', getCards);
+router.get('/', getCards); // ok
 
-router.post('/', createCard);
+router.post('/', createCard); // ok
 
-router.delete('/:cardId', deleteCardById);
+router.delete('/:cardId', deleteCardById); // ok
 
 router.put('/:cardId/likes', likeCard);
 

@@ -5,6 +5,4 @@ class NoStatusError extends Error {
   }
 }
 
-module.export = {
-  NoStatusError,
-};
+module.exports = NoStatusError;
