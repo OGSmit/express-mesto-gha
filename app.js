@@ -55,7 +55,7 @@ app.use((err, req, res, next) => {
   const regExp = /\d{3}/;
   const craftStatusCode = err.message.match(regExp);
   if (craftStatusCode) {
-    err.statusCode = craftStatusCode;
+    return res.status(craftStatusCode).send({ message: err.message });
   }
   const { statusCode = 500, message } = err;
   console.log(`Центральный-..Код=${statusCode} ..Сообщение=${err.message}`);
@@ -66,7 +66,7 @@ app.use((err, req, res, next) => {
         ? 'На сервере произошла ошибка'
         : message,
     });
-  next();
+  return next();
 });
 
 app.listen(PORT, () => {
