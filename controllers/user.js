@@ -43,7 +43,14 @@ module.exports.getUserById = (req, res, next) => {
   User
     .findById(userId).select('+password')
     .orFail()
-    .then((user) => res.send(user))
+    .then((user) => {
+      const {
+        _id, name, about, avatar, email,
+      } = user;
+      res.send({
+        _id, name, about, avatar, email,
+      });
+    })
     .catch((err) => {
       if (err.name === 'CastError') {
         throw new BadRequestError('Bad Rrequest');

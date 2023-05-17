@@ -1,16 +1,30 @@
 const router = require('express').Router();
+const { Joi, celebrate } = require('celebrate');
 
 const {
   getCards, createCard, deleteCardById, likeCard, dislikeCard,
 } = require('../controllers/card');
 
-router.get('/', getCards); // ok
+router.get('/', getCards);
 
-router.post('/', createCard); // ok
+router.post('/', celebrate({
+  body: Joi.object().keys({
+    name: Joi.string().required().min(2).max(30),
+    link: Joi.string().required().pattern(/^(https?|ftp|file):\/\/[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]/),
+  }),
+}), createCard);
 
-router.delete('/:cardId', deleteCardById); // ok
+router.delete('/:cardId', celebrate({
+  params: Joi.object().keys({
+    cardId: Joi.string().alphanum().length(24),
+  }),
+}), deleteCardById);
 
-router.put('/:cardId/likes', likeCard);
+router.put('/:cardId/likes', celebrate({
+  params: Joi.object().keys({
+    cardId: Joi.string().alphanum().length(24),
+  }),
+}), likeCard);
 
 router.delete('/:cardId/likes', dislikeCard);
 
