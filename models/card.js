@@ -14,7 +14,6 @@ const cardsSchema = new mongoose.Schema(
       required: [true, '400 Поле "link" должно быть заполнено'],
       validate: {
         validator(link) {
-          console.log(validator.isURL(link));
           return validator.isURL(link);
         },
         message: '400 некорректный адрес',

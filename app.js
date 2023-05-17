@@ -20,14 +20,6 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 mongoose.connect('mongodb://127.0.0.1:27017/mestodb');
 
-app.use((req, res, next) => {
-  req.user = {
-    _id: '64621b3afde5f2a29f86b8e7',
-  };
-
-  next();
-});
-
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(errors());
 
@@ -56,7 +48,6 @@ app.use((err, req, res, next) => {
     return res.status(craftStatusCode).send({ message: err.message });
   }
   const { statusCode = 500, message } = err;
-  console.log(`Центральный-..Код=${statusCode} ..Сообщение=${err.message}`);
   res
     .status(statusCode)
     .send({

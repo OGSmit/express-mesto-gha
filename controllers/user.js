@@ -43,7 +43,7 @@ module.exports.getUserById = (req, res, next) => {
     .then((user) => res.send(user))
     .catch((err) => {
       if (err.name === 'CastError') {
-        throw new BadRequestError('Bad request');
+        throw new BadRequestError('Bad Rrequest');
       }
 
       if (err.name === 'DocumentNotFoundError') {
@@ -115,7 +115,7 @@ module.exports.updateUserAvatar = (req, res, next) => {
       }
 
       if (err.name === 'DocumentNotFoundError') {
-        throw new NotFoundError({ message: 'пользователь с таким id - отсутствует' });
+        throw new NotFoundError('пользователь с таким id - отсутствует');
       }
 
       throw new NoStatusError('Что-то пошло не так');
@@ -125,21 +125,19 @@ module.exports.updateUserAvatar = (req, res, next) => {
 
 module.exports.login = (req, res, next) => {
   const { email, password } = req.body;
-
-  return User.findUserByCredentials(email, password)
+  User.findUserByCredentials(email, password)
     .then((user) => {
       const token = jwt.sign({ _id: user._id }, 'super-puper-secret-key', { expiresIn: '7d' });
-
       res.send({ token });
     })
     .catch(next);
 };
 
-module.exports.getCurrentUser = (req, res, next) => {
-  User.findById(req.params._id)
+module.exports.getMe = (req, res, next) => {
+  User.findById(req.user._id)
     .orFail()
     .catch(() => {
-      throw new NotFoundError({ message: 'пользователь с таким id - отсутствует' });
+      throw new NotFoundError('пользователь с таким id - отсутствует');
     })
     .then((user) => res.send({ data: user }))
     .catch(next);
