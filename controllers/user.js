@@ -2,8 +2,6 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const NotFoundError = require('../error/not-found-error');
-// const AuthorisationError = require('../error/authorisation-error');
-// const NoStatusError = require('../error/no-status-error');
 const BadRequestError = require('../error/bad-request');
 const NoStatusError = require('../error/no-status-error');
 
@@ -35,7 +33,8 @@ module.exports.createUser = (req, res, next) => {
         name,
         about,
         avatar,
-        email }))
+        email,
+      }))
     .catch(next);
 };
 
