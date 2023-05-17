@@ -30,6 +30,9 @@ module.exports.deleteCardById = (req, res, next) => {
     .findByIdAndRemove(cardId)
     .orFail()
     .then((card) => {
+      if (!card) {
+        throw new NotFoundError({ message: 'карточка с таким id - отсутствует' });
+      }
       res.status(200)
         .send(card);
     })
