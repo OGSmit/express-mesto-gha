@@ -72,18 +72,18 @@ module.exports.dislikeCard = (req, res, next) => {
     { new: true },
   ).then((card) => {
     if (!card) {
-      throw new NotFoundError({ message: 'карточка с таким id - отсутствует' });
+      throw new NotFoundError('карточка с таким id - отсутствует');
     }
     return res.status(200)
       .send(card);
   })
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        res.status(400)
-          .send({ message: 'карточка с таким id - отсутствует' });
-      } else {
-        throw new NoStatusError('Что-то пошло не так');
-      }
-    })
+    // .catch((err) => {
+    //   if (err.name === 'CastError') {
+    //     res.status(400)
+    //       .send({ message: 'карточка с таким id - отсутствует' });
+    //   } else {
+    //     throw new NoStatusError('Что-то пошло не так');
+    //   }
+    // })
     .catch(next);
 };
