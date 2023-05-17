@@ -28,10 +28,17 @@ module.exports.createUser = (req, res, next) => {
       email,
       password: hash,
     }))
-    .then((user) => res.status(201)
-      .send(user))
+    .then((user) => {
+      const { _id } = user;
+      res.send({
+        _id,
+        name,
+        about,
+        avatar,
+        email,
+      });
+    })
     .catch((err) => {
-      console.log(err);
       if (err.code === 11000) {
         throw new NoStatusError(409, 'пользователь с таким email - существует');
       }
