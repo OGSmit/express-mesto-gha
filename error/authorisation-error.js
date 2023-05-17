@@ -5,6 +5,4 @@ class AuthorisationError extends Error {
   }
 }
 
-module.export = {
-  AuthorisationError,
-};
+module.exports = AuthorisationError;

@@ -55,7 +55,7 @@ app.use((err, req, res, next) => {
   if (craftStatusCode) {
     return res.status(craftStatusCode).send({ message: err.message });
   }
-
+  console.log(err, err.message);
   const { statusCode = 500, message } = err;
   res
     .status(statusCode)
