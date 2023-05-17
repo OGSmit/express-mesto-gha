@@ -26,22 +26,17 @@ module.exports.createCard = (req, res, next) => {
 
 module.exports.deleteCardById = (req, res, next) => {
   const { cardId } = req.params;
-  Card
-    .findByIdAndRemove(cardId)
-    .orFail()
+  Card.findById(cardId)
     .then((card) => {
-      if (!card) {
-        throw new NotFoundError({ message: 'карточка с таким id - отсутствует' });
+      if (!card) { throw new NotFoundError('Нет карточки с таким id'); }
+      if (card.owner.toString() !== req.user._id) {
+        throw new NoStatusError(403, 'Недостаточно прав для выполнения операции');
       }
-      res.status(200)
-        .send(card);
-    })
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        throw new NotFoundError('карточка с таким id - отсутствует');
-      } else {
-        throw new NoStatusError('Что-то пошло не так');
-      }
+      Card.findByIdAndDelete(cardId)
+        .then((cardData) => {
+          res.send({ data: cardData });
+        })
+        .catch(next);
     })
     .catch(next);
 };
@@ -53,18 +48,11 @@ module.exports.likeCard = (req, res, next) => {
     { new: true },
   ).then((card) => {
     if (!card) {
-      throw new NotFoundError({ message: 'карточка с таким id - отсутствует' });
+      throw new NotFoundError('карточка с таким id - отсутствует');
     }
     return res.status(200)
       .send(card);
   })
-    .catch((err) => {
-      if (err.name === 'CastError') {
-        throw new NotFoundError({ message: 'карточка с таким id - отсутствует' });
-      } else {
-        throw new NoStatusError('Что-то пошло не так');
-      }
-    })
     .catch(next);
 };
 
@@ -80,13 +68,5 @@ module.exports.dislikeCard = (req, res, next) => {
     return res.status(200)
       .send(card);
   })
-    // .catch((err) => {
-    //   if (err.name === 'CastError') {
-    //     res.status(400)
-    //       .send({ message: 'карточка с таким id - отсутствует' });
-    //   } else {
-    //     throw new NoStatusError('Что-то пошло не так');
-    //   }
-    // })
     .catch(next);
 };

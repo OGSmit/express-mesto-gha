@@ -1,7 +1,7 @@
 class NoStatusError extends Error {
-  constructor(message) {
+  constructor(status, message) {
     super(message);
-    this.statusCode = 500;
+    this.statusCode = status;
   }
 }
 
