@@ -13,11 +13,12 @@ module.exports.createCard = (req, res, next) => {
     name,
     link,
   } = req.body;
-
+  const owner = req.user._id;
   Card
     .create({
       name,
       link,
+      owner,
     })
     .then((card) => res.status(201)
       .send(card))
@@ -35,8 +36,7 @@ module.exports.deleteCardById = (req, res, next) => {
       Card.findByIdAndDelete(cardId)
         .then((cardData) => {
           res.send({ data: cardData });
-        })
-        .catch(next);
+        });
     })
     .catch(next);
 };
