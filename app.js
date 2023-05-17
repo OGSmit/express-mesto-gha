@@ -26,7 +26,7 @@ app.post('/signup', celebrate({
   body: Joi.object().keys({
     name: Joi.string().min(2).max(30),
     about: Joi.string().min(2).max(30),
-    avatar: Joi.string().pattern(/^(https?|ftp|file):\/\/[-a-zA-Z0-9+&@#\/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#\/%=~_|]/),
+    avatar: Joi.string().pattern(/^(https?|ftp|file):\/\/[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]/),
     email: Joi.string().required().email(),
     password: Joi.string().required().pattern(/^[a-zA-Z0-9]{3,30}$/),
   }),
@@ -34,18 +34,21 @@ app.post('/signup', celebrate({
 
 app.post('/signin', celebrate({
   body: Joi.object().keys({
-    email: Joi.string().email(),
-    password: Joi.string().pattern(/^[a-zA-Z0-9]{3,30}$/),
+    email: Joi.string().required().email(),
+    password: Joi.string().required().pattern(/^[a-zA-Z0-9]{3,30}$/),
   }),
 }), login);
 
 app.use('/users', auth, routesUser);
 app.use('/cards', auth, routesCard);
+
 app.use('/*', (req, res) => {
   res.status(404)
     .send({ message: '404: страница не найдена' });
 });
+
 app.use(errors());
+
 app.use((err, req, res, next) => {
   const regExp = /\d{3}/;
   const craftStatusCode = err.message.match(regExp);
