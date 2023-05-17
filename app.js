@@ -3,7 +3,7 @@ const path = require('path');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
 const helmet = require('helmet');
-const { celebrate, Joi, errors } = require('celebrate');
+const { errors } = require('celebrate');
 const routesUser = require('./routes/user');
 const routesCard = require('./routes/card');
 const auth = require('./middlewares/auth');
@@ -23,15 +23,7 @@ mongoose.connect('mongodb://127.0.0.1:27017/mestodb');
 app.use(express.static(path.join(__dirname, 'public')));
 app.use(errors());
 
-app.post('/signup', celebrate({
-  body: Joi.object().keys({
-    name: Joi.string().min(2).max(30),
-    about: Joi.string().min(2).max(30),
-    avatar: Joi.string(),
-    email: Joi.string().required().email(),
-    password: Joi.string().required().min(8),
-  }),
-}), createUser);
+app.post('/signup', createUser);
 app.post('/signin', login);
 
 app.use('/users', auth, routesUser);
@@ -47,6 +39,7 @@ app.use((err, req, res, next) => {
   if (craftStatusCode) {
     return res.status(craftStatusCode).send({ message: err.message });
   }
+  console.log(err.statusCode, err.message);
   const { statusCode = 500, message } = err;
   res
     .status(statusCode)
