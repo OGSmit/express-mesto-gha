@@ -7,6 +7,7 @@ const routesCard = require('./routes/card');
 const auth = require('./middlewares/auth');
 const { createUser, login } = require('./controllers/user');
 const NotFoundError = require('./error/not-found-error');
+const NoStatusError = require('./error/no-status-error');
 
 const { PORT = 3000 } = process.env;
 
@@ -46,6 +47,9 @@ app.use('/*', () => {
 app.use(errors());
 
 app.use((err, req, res, next) => {
+  if (err.code === 11000) {
+    throw new NoStatusError(409, 'пользователь с таким email - существует');
+  }
   const { statusCode = 500, message } = err;
   res
     .status(statusCode)
