@@ -48,7 +48,7 @@ app.use(errors());
 
 app.use((err, req, res, next) => {
   if (err.code === 11000) {
-    throw new NoStatusError(409, 'пользователь с таким email - существует');
+    return res.status(409).send({ message: 'пользователь с таким email - существует' });
   }
   const { statusCode = 500, message } = err;
   res
