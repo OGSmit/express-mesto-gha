@@ -11,10 +11,12 @@ module.exports.getUsers = (req, res, next) => {
 };
 
 module.exports.createUser = (req, res, next) => {
+  // Добавил Дефолтные значения т.к. в конце мы должны отправить обьект пользователя без пароля
+  // , но переменные уже заняты и не могу их достать деструктаризацией
   const {
-    name,
-    about,
-    avatar,
+    name = 'Жак-Ив Кусто',
+    about = 'Исследователь',
+    avatar = 'https://pictures.s3.yandex.net/resources/jacques-cousteau_1604399756.png',
     email,
     password,
   } = req.body;
