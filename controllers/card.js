@@ -33,7 +33,7 @@ module.exports.deleteCardById = (req, res, next) => {
       if (card.owner.toString() !== req.user._id) {
         throw new NoStatusError(403, 'Недостаточно прав для выполнения операции');
       }
-      Card.findByIdAndDelete(cardId)
+      return card.deleteOne()
         .then((cardData) => {
           res.send({ data: cardData });
         });
