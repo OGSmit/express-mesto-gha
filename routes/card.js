@@ -1,5 +1,5 @@
 const router = require('express').Router();
-const { Joi, celebrate } = require('celebrate');
+const { cardBodyValidator, cardIdParamsValidator } = require('../utils/requestValidators');
 
 const {
   getCards, createCard, deleteCardById, likeCard, dislikeCard,
@@ -7,29 +7,12 @@ const {
 
 router.get('/', getCards);
 
-router.post('/', celebrate({
-  body: Joi.object().keys({
-    name: Joi.string().required().min(2).max(30),
-    link: Joi.string().required().pattern(/^(https?|ftp|file):\/\/[-a-zA-Z0-9+&@#/%?=~_|!:,.;]*[-a-zA-Z0-9+&@#/%=~_|]/),
-  }),
-}), createCard);
+router.post('/', cardBodyValidator, createCard);
 
-router.delete('/:cardId', celebrate({
-  params: Joi.object().keys({
-    cardId: Joi.string().required().hex().length(24),
-  }),
-}), deleteCardById);
+router.delete('/:cardId', cardIdParamsValidator, deleteCardById);
 
-router.put('/:cardId/likes', celebrate({
-  params: Joi.object().keys({
-    cardId: Joi.string().required().hex().length(24),
-  }),
-}), likeCard);
+router.put('/:cardId/likes', cardIdParamsValidator, likeCard);
 
-router.delete('/:cardId/likes', celebrate({
-  params: Joi.object().keys({
-    cardId: Joi.string().required().hex().length(24),
-  }),
-}), dislikeCard);
+router.delete('/:cardId/likes', cardIdParamsValidator, dislikeCard);
 
 module.exports = router;
