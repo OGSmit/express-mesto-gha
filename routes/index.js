@@ -13,7 +13,7 @@ router.post('/signin', signInBodyValidator, login);
 router.use('/users', auth, routesUser);
 router.use('/cards', auth, routesCard);
 
-router.use('/*', (next) => {
+router.use('/*', (req, res, next) => {
   next(new NotFoundError('Страница не найдена'));
 });
 
