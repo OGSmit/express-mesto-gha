@@ -13,7 +13,7 @@
     "type": "git",
     "url": "git+https://github.com/OGSmit/express-mesto-gha.git"
   },
-  "author": "",
+  "author": "Oleg Smitkevich",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/OGSmit/express-mesto-gha/issues"

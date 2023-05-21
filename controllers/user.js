@@ -2,7 +2,6 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/user');
 const NotFoundError = require('../error/not-found-error');
-const NoStatusError = require('../error/no-status-error');
 
 module.exports.getUsers = (req, res, next) => {
   User.find({})
@@ -57,13 +56,11 @@ module.exports.getUserById = (req, res, next) => {
     })
     .catch((err) => {
       if (err.name === 'DocumentNotFoundError') {
-        throw new NotFoundError({ message: 'пользователь с таким id - отсутствует' });
+        next(new NotFoundError({ message: 'пользователь с таким id - отсутствует' }));
+      } else {
+        next(err);
       }
-
-      return res.status(500)
-        .send({ message: err.message });
-    })
-    .catch(next);
+    });
 };
 
 module.exports.updateUser = (req, res, next) => {
@@ -89,12 +86,11 @@ module.exports.updateUser = (req, res, next) => {
       .send({ data: user }))
     .catch((err) => {
       if (err.name === 'DocumentNotFoundError') {
-        throw new NotFoundError('пользователь с таким id - отсутствует');
+        next(new NotFoundError('пользователь с таким id - отсутствует'));
+      } else {
+        next(err);
       }
-
-      throw new NoStatusError('Что-то пошло не так');
-    })
-    .catch(next);
+    });
 };
 
 module.exports.updateUserAvatar = (req, res, next) => {
@@ -117,12 +113,11 @@ module.exports.updateUserAvatar = (req, res, next) => {
       .send(user))
     .catch((err) => {
       if (err.name === 'DocumentNotFoundError') {
-        throw new NotFoundError('пользователь с таким id - отсутствует');
+        next(new NotFoundError('пользователь с таким id - отсутствует'));
+      } else {
+        next(err);
       }
-
-      throw new NoStatusError('Что-то пошло не так');
-    })
-    .catch(next);
+    });
 };
 
 module.exports.login = (req, res, next) => {
@@ -139,7 +134,7 @@ module.exports.getMe = (req, res, next) => {
   User.findById(req.user._id)
     .orFail()
     .catch(() => {
-      throw new NotFoundError('пользователь с таким id - отсутствует');
+      next(new NotFoundError('пользователь с таким id - отсутствует'));
     })
     .then((user) => res.send({ data: user }))
     .catch(next);

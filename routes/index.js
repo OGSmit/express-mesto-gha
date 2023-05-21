@@ -13,8 +13,8 @@ router.post('/signin', signInBodyValidator, login);
 router.use('/users', auth, routesUser);
 router.use('/cards', auth, routesCard);
 
-router.use('/*', () => {
-  throw new NotFoundError('Страница не найдена');
+router.use('/*', (next) => {
+  next(new NotFoundError('Страница не найдена'));
 });
 
 module.exports = router;
