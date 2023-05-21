@@ -132,8 +132,7 @@ module.exports.login = (req, res, next) => {
 
 module.exports.getMe = (req, res, next) => {
   User.findById(req.user._id)
-    .orFail()
-    .catch(() => {
+    .orFail(() => {
       next(new NotFoundError('пользователь с таким id - отсутствует'));
     })
     .then((user) => res.send({ data: user }))
